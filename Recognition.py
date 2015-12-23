@@ -85,7 +85,7 @@ if __name__=="__main__":
 	X_train_lda=lda.transform(X_train_pca)
 	X_test_lda=lda.transform(X_test_pca)
 
-	fisherfaces=lda.scalings_.reshape((n_lda,h,w))
+	
 
 
 	# Train an SVM with RBF Kernel
