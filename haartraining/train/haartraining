@@ -1,0 +1,34 @@
+#!/bin/bash
+
+##Script to automate OpenCV haartraining
+
+##Directory must contain:
+
+##positive_images - directory containing all face images (equal size)
+##negative_images - directory containing all non face images
+##positive_format.py - python script to reformat positive.txt file (will be invoked by this script)
+##bin/opencv_createsamples - executable file to create samples/positive image vector
+##bin/opencv_traincascade - executable file to train the model
+
+#STEP 0: Clean the directory 
+rm positives.txt
+rm negatives.txt
+rm faces.vec
+
+#STEP 1: Create description files
+
+find ./positive_images -iname "*.jpg" > positives_old.txt
+find ./negative_images -iname "*.jpg" > negatives.txt
+
+#Reformat positive decription file: modify arguments for specific image dimensions/location
+#(arguments: number of faces, initial x, initial y, width, height)
+python positive_format.py 1 0 0 25 25 
+rm positives_old.txt
+
+#STEP 2: Create a vector file with all positive samples
+
+bin/opencv_createsamples -info positives.txt -num 1206 -w 25 -h 25 -vec faces.vec
+
+#STEP 3: Run the traincascades command (numPos ~ 0.9(number of positive images))
+
+bin/opencv_traincascade -data classifier -vec faces.vec -bg negatives.txt -numStages 10 -nsplits 2 -minhitrate 0.99 -maxfalsealarm 0.5 -numPos 1000 -numNeg 7737 -w 25 -h 25
